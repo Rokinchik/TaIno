@@ -59,9 +59,24 @@ document.addEventListener('DOMContentLoaded', function () {
         const clone = svgElement.cloneNode(true);
         svgElement.parentNode.replaceChild(clone, svgElement);
         
+        clone.style.cssText = `
+            width: 56px;
+            height: 56px;
+            display: block;
+        `;
+
+        // Добавляем viewBox если его нет
+        if (!clone.getAttribute('viewBox')) {
+            const width = clone.getAttribute('width') || '100';
+            const height = clone.getAttribute('height') || '100';
+            clone.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        }
+        
+        clone.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        
         clone.style.display = 'none';
         setTimeout(() => {
-            clone.style.display = '';
+            clone.style.display = 'block';
         }, 10);
     }
 
@@ -97,15 +112,41 @@ document.addEventListener('DOMContentLoaded', function () {
                     try {
                         const response = await fetch(minePositions.has(index) ? 'img/krest.svg' : 'img/stars.svg');
                         const svgText = await response.text();
-                        cell.innerHTML = svgText;
                         
-                        const svgElement = cell.querySelector('svg');
+                        const container = document.createElement('div');
+                        container.style.cssText = `
+                            width: 56px;
+                            height: 56px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            position: relative;
+                        `;
+                        
+                        container.innerHTML = svgText;
+                        cell.appendChild(container);
+                        
+                        const svgElement = container.querySelector('svg');
                         if (svgElement) {
-                            svgElement.setAttribute('width', '40');
-                            svgElement.setAttribute('height', '40');
+                            svgElement.style.cssText = `
+                                width: 56px;
+                                height: 56px;
+                                max-width: 100%;
+                                max-height: 100%;
+                                display: block;
+                            `;
+                            
+                            const originalViewBox = svgElement.getAttribute('viewBox');
+                            if (!originalViewBox) {
+                                const width = svgElement.getAttribute('width') || '100';
+                                const height = svgElement.getAttribute('height') || '100';
+                                svgElement.setAttribute('viewBox', `0 0 ${width} ${height}`);
+                            }
+                            
+                            svgElement.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                            svgElement.classList.add('star-animation');
                             svgElement.style.opacity = '0';
                             svgElement.style.transform = 'scale(0)';
-                            svgElement.classList.add('star-animation');
                             
                             requestAnimationFrame(() => {
                                 svgElement.classList.add('fade-in');
@@ -114,11 +155,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     } catch (error) {
                         const newImg = document.createElement('img');
-                        newImg.setAttribute('width', '40');
-                        newImg.setAttribute('height', '40');
+                        newImg.style.cssText = `
+                            width: 56px;
+                            height: 56px;
+                            display: block;
+                        `;
+                        newImg.src = minePositions.has(index) ? 'img/krest.svg' : 'img/stars.svg';
                         newImg.style.opacity = '0';
                         newImg.style.transform = 'scale(0)';
-                        newImg.src = minePositions.has(index) ? 'img/krest.svg' : 'img/stars.svg';
                         cell.appendChild(newImg);
                         newImg.classList.add('star-animation');
                         
@@ -172,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const cell = document.createElement('button');
             cell.type = 'button';
             cell.className = 'cell';
-            cell.innerHTML = `<img width="50" height="50" src="${imageSrc}">`;
+            cell.innerHTML = `<img width="56" height="56" src="${imageSrc}">`;
             cellsBoard.appendChild(cell);
         });
 
