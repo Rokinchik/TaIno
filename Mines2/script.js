@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const cell = document.createElement('button');
             cell.type = 'button';
             cell.className = 'cell';
-            cell.innerHTML = `<img width="56" height="56" src="${imageSrc}">`;
+            cell.innerHTML = `<img width="50" height="50" src="${imageSrc}">`;
             cellsBoard.appendChild(cell);
         });
 
